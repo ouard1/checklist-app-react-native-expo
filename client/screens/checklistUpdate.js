@@ -22,7 +22,7 @@ import SegmentedButtons from "../shared/segmentedButtons";
 
 export default function ChecklistForm({ route, navigation }) {
   const { defaultValues, checklistOptions } = route.params;
- 
+
   const {
     control,
     handleSubmit,
@@ -169,54 +169,50 @@ export default function ChecklistForm({ route, navigation }) {
         {
           text: "Modifier",
           onPress: () => {
-    axios
-      .put(
-        `http://192.168.43.56:3000/checklistdetails/${defaultValues.entete.id}`,
-        updatedFormData,
-        {
-          headers: {
-            Authorization: `Bearer ${usertoken}`,
+            axios
+              .put(
+                `http://192.168.43.56:3000/checklistdetails/${defaultValues.entete.id}`,
+                updatedFormData,
+                {
+                  headers: {
+                    Authorization: `Bearer ${usertoken}`,
+                  },
+                }
+              )
+              .then((response) => {
+                console.log(response.data);
+                navigation.goBack();
+              })
+              .catch((error) => {
+                console.log(error);
+              });
           },
-        }
-      )
-      .then((response) => {
-        console.log(response.data);
-        navigation.goBack();
-      })
-      .catch((error) => {
-        console.log(error);
-      });   },
-    },
-  ],
-  { cancelable: true }
-);
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.rectangle}>
-        <Ionicons
-          name="chevron-back"
-          color="#fff"
-          style={{ marginTop: 1, marginLeft: 10 }}
-          size={24}
-          onPress={() => navigation.goBack()}
-        ></Ionicons>
-        <Text
-          style={{
-            fontFamily: "poppins-SemiBold",
-            color: "#fff",
-            marginLeft: "27%",
-          }}
-        >
-          Modifier checklist
-        </Text>
+        <View style={styles.headerContainer}>
+          <Ionicons
+            name="chevron-back"
+            color="#fff"
+            style={styles.icon}
+            size={24}
+            onPress={() => navigation.goBack()}
+          />
+          <Text style={styles.headerText}>Modifier checklist</Text>
+          <View style={styles.placeholderIcon}></View>
+        </View>
       </View>
 
       <View
         style={{
           flexDirection: "row",
-          alignItems:'center',
+          alignItems: "center",
           justifyContent: "space-between",
           marginTop: 45,
           marginBottom: 4,
@@ -276,144 +272,140 @@ export default function ChecklistForm({ route, navigation }) {
       </View>
       <View style={{ alignItems: "center" }}>
         <Text style={styles.label}>Chauffeur :</Text>
-        
-          <TouchableOpacity
-            style={styles.holder}
-            onPress={() => {
-              setClickedChauffeur(!clickedChauffeur);
+
+        <TouchableOpacity
+          style={styles.holder}
+          onPress={() => {
+            setClickedChauffeur(!clickedChauffeur);
+          }}
+        >
+          <Text
+            style={{
+              padding: 10,
+              fontSize: 12,
+              color: "rgba(35, 36, 126, 0.8)",
+              fontFamily: "poppins-Light",
             }}
           >
-            <Text
-              style={{
-                padding: 10,
-                fontSize: 12,
-                color: "rgba(35, 36, 126, 0.8)",
-                fontFamily: "poppins-Light",
+            {selectedChauffeur == ""
+              ? "selectionner un chauffeur"
+              : selectedChauffeur}
+          </Text>
+        </TouchableOpacity>
+        {clickedChauffeur && (
+          <View style={styles.dropdownelements}>
+            <TextInput
+              ref={searchRef}
+              style={styles.searchInput}
+              placeholderTextColor={"#23247E"}
+              placeholder=" Rechercher.."
+              value={search}
+              onChangeText={(text) => {
+                setSearch(text);
+                onSearchChauffeur(text);
               }}
-            >
-              {selectedChauffeur == ""
-                ? "selectionner un chauffeur"
-                : selectedChauffeur}
-            </Text>
-          </TouchableOpacity>
-          {clickedChauffeur && (
-            <View style={styles.dropdownelements}>
-              <TextInput
-                ref={searchRef}
-                style={styles.searchInput}
-                placeholderTextColor={"#23247E"}
-                placeholder=" Rechercher.."
-                value={search}
-                onChangeText={(text) => {
-                  setSearch(text);
-                  onSearchChauffeur(text);
-                }}
-              />
-              <FlatList
-                data={datac}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.listItem}
-                    onPress={() => {
-                      setSelectedChauffeur(`${item.nom} ${item.prenom}`);
-                      setSelectedChauffeurId(item.id);
-                      setClickedChauffeur(false);
-                    }}
-                  >
-                    <Text
-                      style={styles.listItemText}
-                    >{`${item.nom} ${item.prenom}`}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          )}
-        
+            />
+            <FlatList
+              data={datac}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.listItem}
+                  onPress={() => {
+                    setSelectedChauffeur(`${item.nom} ${item.prenom}`);
+                    setSelectedChauffeurId(item.id);
+                    setClickedChauffeur(false);
+                  }}
+                >
+                  <Text
+                    style={styles.listItemText}
+                  >{`${item.nom} ${item.prenom}`}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        )}
 
-      
         <Text style={styles.label}>Véhicule :</Text>
 
-        
-          <TouchableOpacity
-            style={styles.holder}
-            onPress={() => {
-              setEquipementClicked(!equipementClicked);
+        <TouchableOpacity
+          style={styles.holder}
+          onPress={() => {
+            setEquipementClicked(!equipementClicked);
+          }}
+        >
+          <Text
+            style={{
+              padding: 10,
+              fontSize: 12,
+              color: "rgba(35, 36, 126, 0.8)",
+              fontFamily: "poppins-Light",
             }}
           >
-            <Text
-              style={{
-                padding: 10,
-                fontSize: 12,
-                color: "rgba(35, 36, 126, 0.8)",
-                fontFamily: "poppins-Light",
+            {selectedEquipement == ""
+              ? "selectionner véhicule"
+              : selectedEquipement}
+          </Text>
+        </TouchableOpacity>
+        {equipementClicked && (
+          <View style={styles.dropdownelements}>
+            <TextInput
+              ref={searchRef}
+              style={styles.searchInput}
+              placeholderTextColor={"#23247E"}
+              placeholder="  Rechercher.."
+              value={search}
+              onChangeText={(text) => {
+                setSearch(text);
+                onSearch(text);
               }}
-            >
-              {selectedEquipement == ""
-                ? "selectionner véhicule"
-                : selectedEquipement}
-            </Text>
-          </TouchableOpacity>
-          {equipementClicked && (
-            <View style={styles.dropdownelements}>
-              <TextInput
-                ref={searchRef}
-                style={styles.searchInput}
-                placeholderTextColor={"#23247E"}
-                placeholder="  Rechercher.."
-                value={search}
-                onChangeText={(text) => {
-                  setSearch(text);
-                  onSearch(text);
-                }}
-              />
-              <FlatList
-                data={data}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.listItem}
-                    onPress={() => {
-                      setSelectedEquipement(item.matricule);
-                      setSelectedEquipementId(item.id);
-                      setEquipementClicked(false);
-                    }}
-                  >
-                    <Text style={styles.listItemText}>{item.matricule}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
+            />
+            <FlatList
+              data={data}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.listItem}
+                  onPress={() => {
+                    setSelectedEquipement(item.matricule);
+                    setSelectedEquipementId(item.id);
+                    setEquipementClicked(false);
+                  }}
+                >
+                  <Text style={styles.listItemText}>{item.matricule}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        )}
+
+        <Text style={styles.label}>Type :</Text>
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, value } }) => (
+            <SegmentedButtons
+              options={[
+                {
+                  value: "entree",
+                  label: "Entrée",
+                },
+                {
+                  value: "sortie",
+                  label: "Sortie",
+                },
+              ]}
+              value={value}
+              onValueChange={setValue}
+              defaultValue={defaultValues.entete.type}
+            />
           )}
-        
-        
-          <Text style={styles.label}>Type :</Text>
-          <Controller
-            control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, value } }) => (
-              <SegmentedButtons
-                options={[
-                  {
-                    value: "entree",
-                    label: "Entrée",
-                  },
-                  {
-                    value: "sortie",
-                    label: "Sortie",
-                  },
-                ]}
-                value={value}
-                onValueChange={setValue}
-                defaultValue={defaultValues.entete.type}
-              />
-            )}
-            name="type"
-          />
-        </View>
-     
+          name="type"
+        />
+      </View>
+
       <ScrollView>
         <View style={styles.sectionsContainer}>
           {checklistOptions.map((option) => (
@@ -586,14 +578,43 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
   },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#23247E",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+
+  icon: {
+    marginTop: 1,
+    marginLeft: 10,
+  },
+
+  headerText: {
+    flex: 1,
+    textAlign: "center",
+    fontFamily: "poppins-SemiBold",
+    color: "#fff",
+  },
+
+  placeholderIcon: {
+    width: 24,
+    height: 24,
+    marginRight: "auto",
+  },
+
   searchInput: {
     height: 37,
     borderRadius: 5,
-    borderColor:"white",
-    borderWidth:2,
+    borderColor: "white",
+    borderWidth: 2,
     paddingHorizontal: 10,
     fontFamily: "poppins-Light",
-    fontSize:13,
+    fontSize: 13,
     backgroundColor: "rgba(35, 36, 126, 0.03)",
   },
   dropdownelements: {
@@ -618,7 +639,7 @@ const styles = StyleSheet.create({
   },
   listItemText: {
     fontSize: 12,
-    color:"rgba(35, 36, 126, 0.8)",
+    color: "rgba(35, 36, 126, 0.8)",
     fontFamily: "poppins-Light",
   },
   dropdownbutton: {

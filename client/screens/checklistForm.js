@@ -148,16 +148,17 @@ export default function ChecklistForm({
           style={{ marginTop: 1, marginLeft: 10 }}
           size={24}
           onPress={() => setModalOpen(false)}
-        ></Ionicons>
-        <Text
-          style={{
-            fontFamily: "poppins-SemiBold",
-            color: "#fff",
-            paddingHorizontal: "27%",
-          }}
-        >
-          Ajouter checklist
-        </Text>
+        />
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <Text
+            style={{
+              fontFamily: "poppins-SemiBold",
+              color: "#fff",
+            }}
+          >
+            Ajouter checklist
+          </Text>
+        </View>
       </View>
 
       <View
@@ -364,7 +365,7 @@ export default function ChecklistForm({
           </Text>
         )}
       </View>
-      <ScrollView>
+      <ScrollView scrollToOverflowEnabled>
         <View style={styles.sectionsContainer}>
           {checklistOptions.map((option) => (
             <View key={option.id}>
@@ -456,7 +457,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginTop: 6,
     elevation: 3,
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.6,
     shadowRadius: 7,
     shadowColor: "rgba(35, 36, 126, 0.3) ",
 
@@ -544,11 +545,11 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 37,
     borderRadius: 5,
-    borderColor:"white",
-    borderWidth:2,
+    borderColor: "white",
+    borderWidth: 2,
     paddingHorizontal: 10,
     fontFamily: "poppins-Light",
-    fontSize:13,
+    fontSize: 13,
     backgroundColor: "rgba(35, 36, 126, 0.03)",
   },
   dropdownelements: {
@@ -574,7 +575,7 @@ const styles = StyleSheet.create({
   },
   listItemText: {
     fontSize: 12,
-    color:"rgba(35, 36, 126, 0.8)",
+    color: "rgba(35, 36, 126, 0.8)",
     fontFamily: "poppins-Light",
   },
   dropdownbutton: {

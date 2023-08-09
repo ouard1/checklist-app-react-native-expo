@@ -4,14 +4,14 @@ import ChecklistDetails from './screens/checklistDetails';
 import { NavigationContainer ,useNavigation} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ChecklistForm from './screens/checklistForm';
-import Login from './screens/login';
-import Camerae from './camera';
 import { View, ActivityIndicator } from 'react-native';
 import { AuthContext, AuthProvider } from './Context/authContext';
 import { ChecklistProvider } from './Context/ChecklistContext';
 import checklistUpdate from './screens/checklistUpdate';
 import { useFonts } from 'expo-font';
+import Login from './screens/login';
 import FilterForm from './screens/FilterForm';
+
 const Stack = createNativeStackNavigator();
 
 function AppNavigation() {
@@ -39,7 +39,6 @@ function AppNavigation() {
           <Stack.Screen name="Home" component={Home} options={{ title: 'Home',headerShown: false  }} />
           <Stack.Screen name="ChecklistDetails" component={ChecklistDetails} options={{ title: 'Details',headerShown: false  , headerStyle: { backgroundColor: '#F2F2FB' } }} />
           <Stack.Screen name="ChecklistForm" component={ChecklistForm} options={{ title: 'ChecklistForm', headerStyle: { backgroundColor: '#f4511e' } }} />
-          <Stack.Screen name="Camera" component={Camerae} />
           <Stack.Screen name="checklistUpdate" component={checklistUpdate} options={{ headerShown: false }} />
           <Stack.Screen name="FilterForm" component={FilterForm} />
         </>
@@ -65,6 +64,8 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
+ 
+
 
   return (
     <AuthProvider>

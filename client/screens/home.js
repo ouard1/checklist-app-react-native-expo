@@ -10,7 +10,8 @@ import {
   Keyboard,
   Alert,
   ScrollView,
-  ActivityIndicator,Dimensions
+  ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import Card from "../shared/card";
 import { Feather } from "@expo/vector-icons";
@@ -23,7 +24,7 @@ import CustomChip from "../shared/CustomChip";
 import { SvgXml } from "react-native-svg";
 import { deletexml, updatexml, xmllogout, filterxml } from "../shared/svgIcons";
 import { useIsFocused } from "@react-navigation/native";
-
+import CustomAxios from "../Axios/axios";
 export default function Home({ navigation }) {
   const [checklistOptions, setChecklistOptions] = useState(null);
   const { chauffeurs, equipements } = useContext(ChecklistContext);
@@ -161,7 +162,6 @@ export default function Home({ navigation }) {
     }
   };
 
-
   useEffect(() => {
     fetchChecklistOptions();
     if (isFocused) {
@@ -212,8 +212,8 @@ export default function Home({ navigation }) {
       //});
 
       // Update the filteredDataSource with the new checklist
-     // setFilteredDataSource((currentChecklists) => {
-       // return [createdChecklist, ...currentChecklists];
+      // setFilteredDataSource((currentChecklists) => {
+      // return [createdChecklist, ...currentChecklists];
       //});
 
       fetchChecklists();
@@ -268,8 +268,6 @@ export default function Home({ navigation }) {
       console.error("Error showing confirmation alert:", error);
     }
   };
-
-  
 
   return (
     <View style={styles.container}>
@@ -393,74 +391,75 @@ export default function Home({ navigation }) {
             </View>
           </View>
         </Modal>
-          <View style={{ maxHeight: screenHeight * 0.67 }}>
-        <FlatList
-          style={{  marginTop: 22 }}
-          data={filteredDataSource}
-          renderItem={({ item }) => {
-            const equipement = equipements?.find(
-              (equipement) => equipement.id === item.entete?.vehicule_id
-            );
-            const matricule = equipement ? equipement.matricule : "";
-            return (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("ChecklistDetails", {
-                    item,
-                    checklistOptions,
-                  })
-                }
-              >
-                <Card>
-                  <View>
-                    <Text
-                      style={{
-                        fontFamily: "poppins-Regular",
-                        fontSize: 14,
-                        color: "#23247E",
-                      }}
-                    >
-                      {matricule}
-                    </Text>
-                    <Text
-                      style={{
-                        fontFamily: "poppins-Regular",
-                        fontSize: 12,
-                        color: "#6d727c",
-                      }}
-                    >
-                      le {item.entete?.date}
-                    </Text>
-                  </View>
+        <View style={{ maxHeight: screenHeight * 0.67 }}>
+          <FlatList
+            style={{ marginTop: 22 }}
+            data={filteredDataSource}
+            renderItem={({ item }) => {
+              const equipement = equipements?.find(
+                (equipement) => equipement.id === item.entete?.vehicule_id
+              );
+              const matricule = equipement ? equipement.matricule : "";
+              return (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("ChecklistDetails", {
+                      item,
+                      checklistOptions,
+                    })
+                  }
+                >
+                  <Card>
+                    <View>
+                      <Text
+                        style={{
+                          fontFamily: "poppins-Regular",
+                          fontSize: 14,
+                          color: "#23247E",
+                        }}
+                      >
+                        {matricule}
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: "poppins-Regular",
+                          fontSize: 12,
+                          color: "#6d727c",
+                        }}
+                      >
+                        le {item.entete?.date}
+                      </Text>
+                    </View>
 
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TouchableOpacity
-                      style={{ marginRight: 8 }}
-                      onPress={() => deleteChecklist(item.entete.id)}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
                     >
-                      <SvgXml xml={deletexml} width="34" height="34" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate("checklistUpdate", {
-                          defaultValues: item,
-                          checklistOptions,
-                        })
-                      }
-                    >
-                      <SvgXml xml={updatexml} width="34" height="34" />
-                    </TouchableOpacity>
-                  </View>
-                </Card>
-              </TouchableOpacity>
-            );
-          }}
-        /></View>
+                      <TouchableOpacity
+                        style={{ marginRight: 8 }}
+                        onPress={() => deleteChecklist(item.entete.id)}
+                      >
+                        <SvgXml xml={deletexml} width="34" height="34" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("checklistUpdate", {
+                            defaultValues: item,
+                            checklistOptions,
+                          })
+                        }
+                      >
+                        <SvgXml xml={updatexml} width="34" height="34" />
+                      </TouchableOpacity>
+                    </View>
+                  </Card>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </View>
 
         <Modal visible={modalOpen} animationType="slide">
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

@@ -97,7 +97,7 @@ export default function FilterForm({
     };
     if (
      
-      new Date(filterValues.dateDebut) > new Date(filterValues.dateFin)
+      new Date(filterValues.dateDebut) >= new Date(filterValues.dateFin)  
     ) {
       Alert.alert(
         "Plage de dates invalide",
@@ -152,7 +152,7 @@ export default function FilterForm({
 
         <Text style={styles.label}>Chauffeur :</Text>
 
-        <View style={{ flex: 1, width: "100%" }}>
+        
           <TouchableOpacity
             style={styles.holder}
             onPress={() => {
@@ -186,6 +186,7 @@ export default function FilterForm({
                 }}
               />
               <FlatList
+               initialNumToRender={50} 
                 data={datac}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
@@ -205,18 +206,22 @@ export default function FilterForm({
               />
             </View>
           )}
-        </View>
+       
 
         <Text style={styles.label}>Véhicule :</Text>
 
-        <View style={{ flex: 1, width: "100%" }}>
           <TouchableOpacity
             style={styles.holder}
             onPress={() => {
               setEquipementClicked(!equipementClicked);
             }}
           >
-            <Text style={styles.input}>
+            <Text   style={{
+                padding: 10,
+                fontSize: 12,
+                color: "rgba(35, 36, 126, 0.8)",
+                fontFamily: "poppins-Light",
+              }}>
               {selectedEquipement == ""
                 ? "Selectionner une matricule "
                 : selectedEquipement}
@@ -236,6 +241,7 @@ export default function FilterForm({
                 }}
               />
               <FlatList
+               initialNumToRender={50} 
                 data={data}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
@@ -253,7 +259,7 @@ export default function FilterForm({
               />
             </View>
           )}
-        </View>
+      
         <Text style={styles.label}>Date début:</Text>
         <View style={styles.holder}>
           {showDateDebutPicker && (
@@ -358,7 +364,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 28,
     position: "absolute",
-    top: "18%",
+    top: "10%",
     left: 0,
     right: 0,
     bottom: 0,
@@ -396,11 +402,12 @@ const styles = StyleSheet.create({
 zIndex:1,
     justifyContent: "center",
     marginBottom: 4,
+   
   },
   dateinput: {
     paddingHorizontal: 10,
     color: "rgba(35, 36, 126, 0.8)",
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: "poppins-Light",
   },
 

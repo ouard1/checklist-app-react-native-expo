@@ -19,14 +19,15 @@ const styles =StyleSheet.create({
         shadowColor :'#263962',
         shadowOpacity : 0.3,
         shadowRadius:2,
-        marginHorizontal:4 ,
+        marginHorizontal:10,
         marginVertical:3,
         paddingHorizontal:18,
-        width:350,
+        width:"90%",
         height:80,
         flexDirection:"row",
         alignItems:"center",
         justifyContent:"space-between",
+        alignSelf:"center"
         
     },
   

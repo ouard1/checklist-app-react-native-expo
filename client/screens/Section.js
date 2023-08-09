@@ -38,6 +38,7 @@ const Section = ({ title, setFormData, sectionIndex }) => {
   const [value, setValue] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [etatError, setEtatError] = useState(false);
+
   useEffect(() => {
     (async () => {
       MediaLibrary.requestPermissionsAsync();
@@ -45,6 +46,7 @@ const Section = ({ title, setFormData, sectionIndex }) => {
       setHasCameraPermission(cameraStatus.status === "granted");
     })();
   }, []);
+
   const handleSectionSubmit = (data) => {
     if (value == "") {
       setEtatError(true);
@@ -80,7 +82,36 @@ const Section = ({ title, setFormData, sectionIndex }) => {
         quality: 0.5,
         base64: true,
       });
-      setImage(photo.uri);
+      const source = photo.base64;
+
+      if (source) {
+        await cameraRef.current.pausePreview();
+
+        let base64Img = `data:image/jpg;base64,${source}`;
+        let apiUrl = "https://api.cloudinary.com/v1_1/ddg2yfroh/image/upload";
+        let data = {
+          file: base64Img,
+          upload_preset: "jz4wwrdn",
+        };
+
+        fetch(apiUrl, {
+          body: JSON.stringify(data),
+          headers: {
+            "content-type": "application/json",
+          },
+          method: "POST",
+        })
+          .then(async (response) => {
+            let data = await response.json();
+            if (data.secure_url) {
+              console.log(data.secure_url);
+              setImage(data.secure_url);
+            }
+          })
+          .catch((err) => {
+            alert("Cannot upload");
+          });
+      }
     }
   };
 
@@ -412,7 +443,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 60,
-    width: 200,
+    width:"65%",
     borderRadius: 7,
     marginRight: 2,
     backgroundColor: "rgba(35, 36, 126, 0.02)",

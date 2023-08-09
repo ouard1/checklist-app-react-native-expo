@@ -35,37 +35,42 @@ export default function ChecklistDetails({ route, navigation }) {
     setImageLoaded(false);
   };
 
-  return (
-    <View style={styles.container}>
+  return ( <>
+    <View style={styles.rectangle}>
+    <View
+      style={{
+        flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  flex: 1,
+  position: "relative",
+      }}
+    >
+      <Ionicons
+        name="chevron-back"
+        color="#fff"
+        style={{ marginTop:17,alignSelf: "flex-start",marginRight: "auto",}}
+        size={24}
+        onPress={() => navigation.goBack()}
+      ></Ionicons>
+      <Text
+        style={{
+          fontFamily: "poppins-SemiBold",
+          color: "#fff",
+        
+        }}
+      >
+        {" "}
+        Details de la checklist{" "}
+      </Text>
+      <View style={{ width: 24,
+  height: 24,
+  marginRight: "auto", }}></View>
+    </View>
+  </View>
+    <ScrollView style={styles.container}>
     
-        <View style={styles.rectangle}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Ionicons
-              name="chevron-back"
-              color="#fff"
-              style={{ marginTop: 13, marginLeft: 15, alignSelf: "flex-start" }}
-              size={24}
-              onPress={() => navigation.goBack()}
-            ></Ionicons>
-            <Text
-              style={{
-                fontFamily: "poppins-SemiBold",
-                color: "#fff",
-                fontSize: 16,
-                marginTop: 15,
-                marginRight: "27%",
-              }}
-            >
-              {" "}
-              Details de la checklist{" "}
-            </Text>
-          </View>
+       
           <View style={styles.card}>
             <View style={styles.smrectangle}>
               <Text style={{ fontFamily: "poppins-Regular", color: "#23247E" }}>
@@ -214,9 +219,9 @@ export default function ChecklistDetails({ route, navigation }) {
               </Collapsible>
             </View>
           ))}
-        </View>
+      
     
-    </View>
+    </ScrollView></>
   );
 }
 
@@ -224,7 +229,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    padding: 20,
+   
   },
   detail: {
     alignSelf: "flex-start",
@@ -240,14 +245,12 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   rectangle: {
-    position: "absolute",
+    position: "relative",
     backgroundColor: "#23247E",
-    top: 0,
-    left: 0,
-    right: 0,
+    height:60,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    bottom: "95%",
+    
   },
   smrectangle: {
     position: "absolute",
@@ -270,12 +273,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowColor: "#23247E",
     marginHorizontal: 7,
-    marginTop: 15,
+   marginTop: 5 ,
     width: "85%",
     height: 150,
     alignSelf: "center",
     flexDirection: "column",
     justifyContent: "space-between",
+   
   },
 
   label: {
@@ -302,12 +306,12 @@ const styles = StyleSheet.create({
     height: 200,
   },
   image: {
-    width: 300,
+    width: "100%",
     height: 160,
     marginTop: 10,
     marginBottom: 5,
     borderRadius: 7,
-    opacity: 0.6,
+    opacity: 0.5,
     backgroundColor: "#23247E",
   },
   fullscreen: {
@@ -319,8 +323,8 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+   flex:1,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
     justifyContent: "center",
     alignItems: "center",
   },
