@@ -78,6 +78,7 @@ const Section = ({ title, setFormData, sectionIndex }) => {
   };
   const takePicture = async () => {
     if (cameraRef.current) {
+      cameraRef.current.resumePreview();
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.5,
         base64: true,

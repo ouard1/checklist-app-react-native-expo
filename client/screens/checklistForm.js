@@ -7,7 +7,9 @@ import {
   Pressable,
   StyleSheet,
   ScrollView,
+  Modal,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   FlatList,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -160,212 +162,234 @@ export default function ChecklistForm({
           </Text>
         </View>
       </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: 45,
-          marginBottom: 4,
-        }}
-      >
-        <Text style={styles.label}>Date :</Text>
-        <View>
-          {showDatePicker && (
-            <DateTimePicker
-              mode="date"
-              display="spinner"
-              value={date}
-              onChange={onChangeDate}
-            />
-          )}
-          {!showDatePicker && (
-            <Pressable onPress={toggleDatePicker}>
-              <TextInput
-                style={styles.dateinput}
-                editable={false}
-                placeholderTextColor={"rgba(35, 36, 126, 0.8)"}
-                placeholder={
-                  !date
-                    ? "veuillez rentrer la date"
-                    : date.toISOString().slice(0, 10)
-                }
+      <ScrollView>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: 45,
+            marginBottom: 4,
+          }}
+        >
+          <Text style={styles.label}>Date :</Text>
+          <View>
+            {showDatePicker && (
+              <DateTimePicker
+                mode="date"
+                display="spinner"
+                value={date}
+                onChange={onChangeDate}
               />
-            </Pressable>
+            )}
+            {!showDatePicker && (
+              <Pressable onPress={toggleDatePicker}>
+                <TextInput
+                  style={styles.dateinput}
+                  editable={false}
+                  placeholderTextColor={"rgba(35, 36, 126, 0.8)"}
+                  placeholder={
+                    !date
+                      ? "veuillez rentrer la date"
+                      : date.toISOString().slice(0, 10)
+                  }
+                />
+              </Pressable>
+            )}
+          </View>
+
+          <Text style={styles.label}>Heure :</Text>
+          <View>
+            {showTimePicker && (
+              <DateTimePicker
+                mode="time"
+                display="spinner"
+                value={time}
+                onChange={onChangeTime}
+              />
+            )}
+            {!showTimePicker && (
+              <Pressable onPress={toggleTimePicker}>
+                <TextInput
+                  style={styles.timeinput}
+                  editable={false}
+                  placeholderTextColor={"rgba(35, 36, 126, 0.8)"}
+                  placeholder={
+                    !time
+                      ? "veuillez rentrer le temps"
+                      : time.toTimeString().slice(0, 8)
+                  }
+                />
+              </Pressable>
+            )}
+          </View>
+        </View>
+        <View style={{ alignItems: "center" }}>
+          <Text style={styles.label}>Chauffeur :</Text>
+
+          <TouchableOpacity
+            style={styles.holder}
+            onPress={() => {
+              setClickedChauffeur(!clickedChauffeur);
+            }}
+          >
+            <Text
+              style={{
+                padding: 10,
+                fontSize: 12,
+                color: "rgba(35, 36, 126, 0.8)",
+                fontFamily: "poppins-Light",
+              }}
+            >
+              {selectedChauffeur == ""
+                ? "selectionner un chauffeur"
+                : selectedChauffeur}
+            </Text>
+          </TouchableOpacity>
+          <Modal
+            visible={clickedChauffeur}
+            transparent={true}
+            animationType="fade"
+          >
+            <TouchableWithoutFeedback
+              onPress={() => setClickedChauffeur(false)}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.dropdownModal}>
+                  <TextInput
+                    ref={searchRef}
+                    style={styles.searchInput}
+                    placeholderTextColor={"#23247E"}
+                    placeholder="Rechercher.."
+                    value={search}
+                    onChangeText={(text) => {
+                      setSearch(text);
+                      onSearchChauffeur(text);
+                    }}
+                  />
+                  <FlatList
+                    data={datac}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={styles.listItem}
+                        onPress={() => {
+                          setSelectedChauffeur(`${item.nom} ${item.prenom}`);
+                          setSelectedChauffeurId(item.id);
+                          setClickedChauffeur(false);
+                        }}
+                      >
+                        <Text
+                          style={styles.listItemText}
+                        >{`${item.nom} ${item.prenom}`}</Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+
+          {chauffeurError && (
+            <Text style={styles.errorText}>
+              Un chauffeur doit être sélectionné.
+            </Text>
+          )}
+
+          <Text style={styles.label}>Véhicule :</Text>
+
+          <TouchableOpacity
+            style={styles.holder}
+            onPress={() => {
+              setEquipementClicked(!equipementClicked);
+            }}
+          >
+            <Text
+              style={{
+                padding: 10,
+                fontSize: 12,
+                color: "rgba(35, 36, 126, 0.8)",
+                fontFamily: "poppins-Light",
+              }}
+            >
+              {selectedEquipement == ""
+                ? "selectionner véhicule"
+                : selectedEquipement}
+            </Text>
+          </TouchableOpacity>
+          <Modal
+            visible={equipementClicked}
+            transparent={true}
+            animationType="fade"
+          >
+            <TouchableWithoutFeedback
+              onPress={() => setEquipementClicked(false)}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.dropdownModal}>
+                  <TextInput
+                    ref={searchRef}
+                    style={styles.searchInput}
+                    placeholderTextColor={"#23247E"}
+                    placeholder="Rechercher.."
+                    value={search}
+                    onChangeText={(text) => {
+                      setSearch(text);
+                      onSearch(text);
+                    }}
+                  />
+                  <FlatList
+                    data={data}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={styles.listItem}
+                        onPress={() => {
+                          setSelectedEquipement(item.matricule);
+                          setSelectedEquipementId(item.id);
+                          setEquipementClicked(false);
+                        }}
+                      >
+                        <Text style={styles.listItemText}>
+                          {item.matricule}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+
+          {equipementsError && (
+            <Text style={styles.errorText}>
+              Un véhicule doit être sélectionné.
+            </Text>
+          )}
+
+          <Text style={styles.label}>Type :</Text>
+
+          <SegmentedButtons
+            options={[
+              {
+                value: "entree",
+                label: "Entrée",
+              },
+              {
+                value: "sortie",
+                label: "Sortie",
+              },
+            ]}
+            value={value}
+            onValueChange={setValue}
+          />
+          {typeError && (
+            <Text style={styles.errorText}>
+              Veuillez choisir un type (sortie ou entrée)
+            </Text>
           )}
         </View>
 
-        <Text style={styles.label}>Heure :</Text>
-        <View>
-          {showTimePicker && (
-            <DateTimePicker
-              mode="time"
-              display="spinner"
-              value={time}
-              onChange={onChangeTime}
-            />
-          )}
-          {!showTimePicker && (
-            <Pressable onPress={toggleTimePicker}>
-              <TextInput
-                style={styles.timeinput}
-                editable={false}
-                placeholderTextColor={"rgba(35, 36, 126, 0.8)"}
-                placeholder={
-                  !time
-                    ? "veuillez rentrer le temps"
-                    : time.toTimeString().slice(0, 8)
-                }
-              />
-            </Pressable>
-          )}
-        </View>
-      </View>
-      <View style={{ alignItems: "center" }}>
-        <Text style={styles.label}>Chauffeur :</Text>
-
-        <TouchableOpacity
-          style={styles.holder}
-          onPress={() => {
-            setClickedChauffeur(!clickedChauffeur);
-          }}
-        >
-          <Text
-            style={{
-              padding: 10,
-              fontSize: 12,
-              color: "rgba(35, 36, 126, 0.8)",
-              fontFamily: "poppins-Light",
-            }}
-          >
-            {selectedChauffeur == ""
-              ? "selectionner un chauffeur"
-              : selectedChauffeur}
-          </Text>
-        </TouchableOpacity>
-        {clickedChauffeur && (
-          <View style={styles.dropdownelements}>
-            <TextInput
-              ref={searchRef}
-              style={styles.searchInput}
-              placeholderTextColor={"#23247E"}
-              placeholder=" Rechercher.."
-              value={search}
-              onChangeText={(text) => {
-                setSearch(text);
-                onSearchChauffeur(text);
-              }}
-            />
-            <FlatList
-              data={datac}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.listItem}
-                  onPress={() => {
-                    setSelectedChauffeur(`${item.nom} ${item.prenom}`);
-                    setSelectedChauffeurId(item.id);
-                    setClickedChauffeur(false);
-                  }}
-                >
-                  <Text
-                    style={styles.listItemText}
-                  >{`${item.nom} ${item.prenom}`}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        )}
-
-        {chauffeurError && (
-          <Text style={styles.errorText}>
-            Un chauffeur doit être sélectionné.
-          </Text>
-        )}
-
-        <Text style={styles.label}>Véhicule :</Text>
-
-        <TouchableOpacity
-          style={styles.holder}
-          onPress={() => {
-            setEquipementClicked(!equipementClicked);
-          }}
-        >
-          <Text
-            style={{
-              padding: 10,
-              fontSize: 12,
-              color: "rgba(35, 36, 126, 0.8)",
-              fontFamily: "poppins-Light",
-            }}
-          >
-            {selectedEquipement == ""
-              ? "selectionner véhicule"
-              : selectedEquipement}
-          </Text>
-        </TouchableOpacity>
-        {equipementClicked && (
-          <View style={styles.dropdownelements}>
-            <TextInput
-              ref={searchRef}
-              style={styles.searchInput}
-              placeholderTextColor={"#23247E"}
-              placeholder="  Rechercher.."
-              value={search}
-              onChangeText={(text) => {
-                setSearch(text);
-                onSearch(text);
-              }}
-            />
-            <FlatList
-              data={data}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.listItem}
-                  onPress={() => {
-                    setSelectedEquipement(item.matricule);
-                    setSelectedEquipementId(item.id);
-                    setEquipementClicked(false);
-                  }}
-                >
-                  <Text style={styles.listItemText}>{item.matricule}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        )}
-
-        {equipementsError && (
-          <Text style={styles.errorText}>
-            Un véhicule doit être sélectionné.
-          </Text>
-        )}
-
-        <Text style={styles.label}>Type :</Text>
-
-        <SegmentedButtons
-          options={[
-            {
-              value: "entree",
-              label: "Entrée",
-            },
-            {
-              value: "sortie",
-              label: "Sortie",
-            },
-          ]}
-          value={value}
-          onValueChange={setValue}
-        />
-        {typeError && (
-          <Text style={styles.errorText}>
-            Veuillez choisir un type (sortie ou entrée)
-          </Text>
-        )}
-      </View>
-      <ScrollView scrollToOverflowEnabled>
         <View style={styles.sectionsContainer}>
           {checklistOptions.map((option) => (
             <View key={option.id}>
@@ -456,10 +480,11 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "#fff",
     marginTop: 6,
-    elevation: 3,
-    shadowOpacity: 0.6,
+    elevation: 5,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
     shadowRadius: 7,
-    shadowColor: "rgba(35, 36, 126, 0.3) ",
+    shadowColor: "#23247E",
 
     margin: 2,
     zIndex: 2,
@@ -534,6 +559,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginVertical: 5,
   },
+  cancelButton: {
+    marginTop: 10,
+    backgroundColor: "#E0E0E0",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  cancelButtonText: {
+    color: "#333",
+    fontFamily: "poppins-Regular",
+    fontSize: 16,
+  },
   input: {
     padding: 10,
     fontSize: 12,
@@ -591,5 +628,23 @@ const styles = StyleSheet.create({
   sectionsContainer: {
     backgroundColor: "#fff",
     flex: 1,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  dropdownModal: {
+    width: "80%",
+    height: 350,
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    elevation: 5,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 7,
+    shadowColor: "#23247E",
   },
 });

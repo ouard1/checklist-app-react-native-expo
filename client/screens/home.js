@@ -24,7 +24,7 @@ import CustomChip from "../shared/CustomChip";
 import { SvgXml } from "react-native-svg";
 import { deletexml, updatexml, xmllogout, filterxml } from "../shared/svgIcons";
 import { useIsFocused } from "@react-navigation/native";
-import CustomAxios from "../Axios/axios";
+
 export default function Home({ navigation }) {
   const [checklistOptions, setChecklistOptions] = useState(null);
   const { chauffeurs, equipements } = useContext(ChecklistContext);
