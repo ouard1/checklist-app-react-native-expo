@@ -10,6 +10,7 @@ import {
   Keyboard,
   Alert,
   ScrollView,
+  ToastAndroid,
   ActivityIndicator,
   Dimensions,
 } from "react-native";
@@ -23,17 +24,118 @@ import FilterForm from "./FilterForm";
 import CustomChip from "../shared/CustomChip";
 import { SvgXml } from "react-native-svg";
 import { deletexml, updatexml, xmllogout, filterxml } from "../shared/svgIcons";
-import { useIsFocused } from "@react-navigation/native";
 
+import qs from 'qs'; 
+
+class MemoizedListItem extends React.PureComponent {
+  render() {
+    const { item, navigation, equipements, checklistOptions ,onDeleteChecklist} = this.props;
+    
+  const equipement = equipements?.find(
+    (equipement) => equipement.id === item.entete?.vehicule_id
+  );
+  const matricule = equipement ? equipement.matricule : "";
+  const deleteChecklist = async (id) => {
+    try {
+      Alert.alert(
+        "Confirmation",
+        "Êtes-vous sûr de vouloir supprimer cette checklist ?",
+        [
+          {
+            text: "Annuler",
+            style: "cancel",
+          },
+          {
+            text: "Supprimer",
+            onPress: async () => {
+              try {
+                await onDeleteChecklist(id); 
+                
+               
+              } catch (error) {
+                console.error("Error deleting checklist:", error);
+              }
+            },
+          },
+        ],
+        { cancelable: true }
+      );
+    } catch (error) {
+      console.error("Error showing confirmation alert:", error);
+    }
+  };
+  
+  
+  return (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("ChecklistDetails", {
+          item,
+          checklistOptions,
+        })
+      }
+    >
+      <Card>
+                    <View>
+                      <Text
+                        style={{
+                          fontFamily: "poppins-Regular",
+                          fontSize: 14,
+                          color: "#23247E",
+                        }}
+                      >
+                        {matricule}
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: "poppins-Regular",
+                          fontSize: 12,
+                          color: "#6d727c",
+                        }}
+                      >
+                        le {item.entete?.date}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={{ marginRight: 8 }}
+                        onPress={() => deleteChecklist(item.entete.id)}
+                      >
+                        <SvgXml xml={deletexml} width="34" height="34" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("checklistUpdate", {
+                            defaultValues: item,
+                            checklistOptions,
+                          })
+                        }
+                      >
+                        <SvgXml xml={updatexml} width="34" height="34" />
+                      </TouchableOpacity>
+                    </View>
+                  </Card>
+    </TouchableOpacity>
+  );
+}
+}
 export default function Home({ navigation }) {
   const [checklistOptions, setChecklistOptions] = useState(null);
   const { chauffeurs, equipements } = useContext(ChecklistContext);
   const [filteredDataSource, setFilteredDataSource] = useState([]);
   const { logout, usertoken } = useContext(AuthContext);
   const [modalOpen, setModalOpen] = useState(false);
-  const [checklists, setChecklists] = useState(null);
-  const isFocused = useIsFocused();
+  const [checklists, setChecklists] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isLoading,setIsLoading] = useState(true);
   const [filterValues, setFilterValues] = useState({
     equipement_id: null,
     chauffeur_id: null,
@@ -77,73 +179,71 @@ export default function Home({ navigation }) {
         type: "",
       }));
     }
+    setCurrentPage(1);
   };
 
-  useEffect(() => {
-    if (checklists) {
-      try {
-        const filteredData = checklists.filter((item) => {
-          if (
-            (filterValues.equipement_id &&
-              item.entete.vehicule_id !== filterValues.equipement_id) ||
-            (filterValues.chauffeur_id &&
-              item.entete.chauffeur_id !== filterValues.chauffeur_id) ||
-            (filterValues.dateDebut &&
-              item.entete.date < filterValues.dateDebut) ||
-            (filterValues.dateFin && item.entete.date > filterValues.dateFin) ||
-            (filterValues.type && item.entete.type !== filterValues.type)
-          ) {
-            return false;
-          }
-          return true;
-        });
 
-        setFilteredDataSource(filteredData);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }, [filterValues, checklists]);
 
-  const handleFilterSubmit = (filterValues) => {
-    setFilterValues(filterValues);
-    const filteredData = checklists.filter((item) => {
-      if (
-        (filterValues.equipement_id &&
-          item.entete.vehicule_id !== filterValues.equipement_id) ||
-        (filterValues.chauffeur_id &&
-          item.entete.chauffeur_id !== filterValues.chauffeur_id) ||
-        (filterValues.dateDebut && item.entete.date < filterValues.dateDebut) ||
-        (filterValues.dateFin && item.entete.date > filterValues.dateFin) ||
-        (filterValues.type && item.entete.type !== filterValues.type)
-      ) {
-        return false;
-      }
-      return true;
-    });
-
-    setFilteredDataSource(filteredData);
-    setModalVisible(false);
-  };
-
-  const fetchChecklists = async () => {
+  const deleteChecklist = async (id) => {
     try {
-      const response = await axios.get(
-        "http://192.168.43.56:3000/checklistdetails",
+     const response =  await axios.delete(
+        `http://192.168.43.56:3000/checklistdetails/${id}`,
         {
           headers: {
             Authorization: `Bearer ${usertoken}`,
           },
         }
       );
-      const data = response.data;
-
-      setChecklists(data);
-      setFilteredDataSource(data);
+  
+      ToastAndroid.show('Checklist supprimée!', ToastAndroid.SHORT);
+      setChecklists((currentChecklists) =>
+        currentChecklists.filter((checklist) => checklist.entete.id !== id)
+      );
+      setFilteredDataSource((currentDataSource) =>
+        currentDataSource.filter((checklist) => checklist.entete.id !== id)
+      );
     } catch (error) {
-      console.error("Error fetching checklists:", error);
+   
+      if (error.response && error.response.data) {
+        console.error("Error deleting checklist:", error.response.data);
+      } else {
+        console.error("Error deleting checklist:", error.message);
+      }
     }
   };
+  
+
+  const fetchChecklists = async (page) => {
+    try {
+      setIsLoading(true); 
+  
+      const queryParams = qs.stringify(filterValues);
+      const response = await axios.get(
+        `http://192.168.43.56:3000/checklistdetails?page=${page}&${queryParams}`,
+        {
+          headers: {
+            Authorization: `Bearer ${usertoken}`,
+           
+          },
+        }
+      );
+      const data = response.data;
+  
+      setTotalPages(data.totalPages);
+      if (page === 1) {
+        setChecklists(data.checklists);
+        setFilteredDataSource(data.checklists);
+      } else {
+        setChecklists((prevChecklists) => [ ...prevChecklists, ...data.checklists]);
+        setFilteredDataSource((prevChecklists) => [ ...prevChecklists ,...data.checklists,]);
+      }
+    } catch (error) {
+      console.error("Error fetching checklists:", error);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
+  };
+  
 
   const fetchChecklistOptions = async () => {
     try {
@@ -152,6 +252,7 @@ export default function Home({ navigation }) {
         {
           headers: {
             Authorization: `Bearer ${usertoken}`,
+            
           },
         }
       );
@@ -164,10 +265,9 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     fetchChecklistOptions();
-    if (isFocused) {
-      fetchChecklists();
-    }
-  }, [isFocused]);
+    fetchChecklists(currentPage); 
+  }, [ currentPage,filterValues]);
+  
 
   const sendFormData = async (formData) => {
     try {
@@ -183,16 +283,16 @@ export default function Home({ navigation }) {
       }
       // Create a new formData object with the filtered checklistDetails
       const updatedFormData = {
-        entete: {
+        
           date: formData.date,
           heure: formData.heure,
           vehicule_id: formData.vehicule_id,
           chauffeur_id: formData.chauffeur_id,
           type: formData.type,
-        },
+        
         checklistDetails: filteredChecklistDetails,
       };
-
+      
       const response = await axios.post(
         "http://192.168.43.56:3000/checklistdetails",
         updatedFormData,
@@ -202,72 +302,27 @@ export default function Home({ navigation }) {
           },
         }
       );
-
+      ToastAndroid.show('Checklist crée!', ToastAndroid.SHORT);
       setModalOpen(false);
-      const createdChecklist = response.data;
-
-      // Update the local state checklists with the newly created checklist
-      //setChecklists((currentChecklists) => {
-      //  return [createdChecklist, ...currentChecklists];
-      //});
+      const createdChecklist = response.data.checklist; 
+      console.log(createdChecklist)
+      setChecklists((currentChecklists) => {
+        return [createdChecklist, ...currentChecklists];
+      });
 
       // Update the filteredDataSource with the new checklist
-      // setFilteredDataSource((currentChecklists) => {
-      // return [createdChecklist, ...currentChecklists];
-      //});
+       setFilteredDataSource((currentChecklists) => {
+      return [createdChecklist, ...currentChecklists];
+      });
 
-      fetchChecklists();
+      
     } catch (error) {
+      ToastAndroid.show('erreur! veuillez réessayer dans quelques instants', ToastAndroid.SHORT);
       console.log("Error sending Form data:", error);
     }
   };
 
-  const deleteChecklist = async (id) => {
-    try {
-      Alert.alert(
-        "Confirmation",
-        "Êtes-vous sûr de vouloir supprimer cette checklist ?",
-        [
-          {
-            text: "Annuler",
-            style: "cancel",
-          },
-          {
-            text: "Supprimer",
-            onPress: async () => {
-              try {
-                await axios.delete(
-                  `http://192.168.43.56:3000/checklistdetails/${id}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${usertoken}`,
-                    },
-                  }
-                );
-                console.log("Checklist deleted successfully");
-
-                setChecklists((currentChecklists) =>
-                  currentChecklists.filter(
-                    (checklist) => checklist.entete.id !== id
-                  )
-                );
-                setFilteredDataSource((currentDataSource) =>
-                  currentDataSource.filter(
-                    (checklist) => checklist.entete.id !== id
-                  )
-                );
-              } catch (error) {
-                console.error("Error deleting checklist:", error);
-              }
-            },
-          },
-        ],
-        { cancelable: true }
-      );
-    } catch (error) {
-      console.error("Error showing confirmation alert:", error);
-    }
-  };
+ 
 
   return (
     <View style={styles.container}>
@@ -383,7 +438,12 @@ export default function Home({ navigation }) {
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
                 <FilterForm
-                  onSubmit={handleFilterSubmit}
+                  onSubmit={(filterValues) => {
+                    setFilterValues(filterValues); 
+                    setCurrentPage(1);
+                    fetchChecklists(1, filterValues); // Fetch data based on the filters
+                    setModalVisible(false); // Close the filter modal
+                  }}
                   setAppliedFilters={setAppliedFilters}
                   setModalVisible={setModalVisible}
                 />
@@ -395,70 +455,36 @@ export default function Home({ navigation }) {
           <FlatList
             style={{ marginTop: 22 }}
             data={filteredDataSource}
-            renderItem={({ item }) => {
-              const equipement = equipements?.find(
-                (equipement) => equipement.id === item.entete?.vehicule_id
-              );
-              const matricule = equipement ? equipement.matricule : "";
-              return (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate("ChecklistDetails", {
-                      item,
-                      checklistOptions,
-                    })
-                  }
-                >
-                  <Card>
-                    <View>
-                      <Text
-                        style={{
-                          fontFamily: "poppins-Regular",
-                          fontSize: 14,
-                          color: "#23247E",
-                        }}
-                      >
-                        {matricule}
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: "poppins-Regular",
-                          fontSize: 12,
-                          color: "#6d727c",
-                        }}
-                      >
-                        le {item.entete?.date}
-                      </Text>
-                    </View>
-
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <TouchableOpacity
-                        style={{ marginRight: 8 }}
-                        onPress={() => deleteChecklist(item.entete.id)}
-                      >
-                        <SvgXml xml={deletexml} width="34" height="34" />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() =>
-                          navigation.navigate("checklistUpdate", {
-                            defaultValues: item,
-                            checklistOptions,
-                          })
-                        }
-                      >
-                        <SvgXml xml={updatexml} width="34" height="34" />
-                      </TouchableOpacity>
-                    </View>
-                  </Card>
-                </TouchableOpacity>
-              );
+            initialNumToRender={20}
+            ListFooterComponent={() => {
+              if (isLoading && currentPage < totalPages) {
+                return <ActivityIndicator size="small" color="#0000ff" />;
+              } else {
+                return null;
+              }
             }}
+            ListHeaderComponent={
+              isLoading && <ActivityIndicator size="large" color="#ffffff" /> }
+            onEndReached={() => {
+              console.log(currentPage,totalPages)
+              if (currentPage < totalPages) {
+                const nextPage = currentPage + 1;
+                setCurrentPage(nextPage);
+                fetchChecklists(nextPage);
+              }
+            }}
+            onEndReachedThreshold={0.1} 
+            renderItem={({ item }) => (
+              <MemoizedListItem
+                item={item}
+                navigation={navigation}
+                equipements={equipements}
+                checklistOptions={checklistOptions}
+                onDeleteChecklist={deleteChecklist}
+              />
+            )}
           />
+         
         </View>
 
         <Modal visible={modalOpen} animationType="slide">

@@ -131,7 +131,6 @@ export default function FilterForm({
     }
 
     setAppliedFilters(filters);
-
     onSubmit(filterValues);
   };
 

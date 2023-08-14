@@ -10,6 +10,7 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  ToastAndroid,
   Modal,
   TouchableWithoutFeedback,
   Alert,
@@ -182,7 +183,7 @@ export default function ChecklistForm({ route, navigation }) {
                 }
               )
               .then((response) => {
-                console.log(response.data);
+                ToastAndroid.show('Checklist modifiée!', ToastAndroid.SHORT);
                 navigation.goBack();
               })
               .catch((error) => {

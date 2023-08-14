@@ -78,7 +78,7 @@ const Section = ({ title, setFormData, sectionIndex }) => {
   };
   const takePicture = async () => {
     if (cameraRef.current) {
-      cameraRef.current.resumePreview();
+     // cameraRef.current.resumePreview();
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.5,
         base64: true,
@@ -86,7 +86,7 @@ const Section = ({ title, setFormData, sectionIndex }) => {
       const source = photo.base64;
 
       if (source) {
-        await cameraRef.current.pausePreview();
+       // await cameraRef.current.pausePreview();
 
         let base64Img = `data:image/jpg;base64,${source}`;
         let apiUrl = "https://api.cloudinary.com/v1_1/ddg2yfroh/image/upload";

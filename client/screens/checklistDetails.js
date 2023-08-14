@@ -29,7 +29,7 @@ export default function ChecklistDetails({ route, navigation }) {
   };
 
   const { chauffeurs, equipements, etats } = useContext(ChecklistContext);
-  console.log(etats);
+  
   const handleImageClick = () => {
     setModalVisible(true);
     setImageLoaded(false);
@@ -117,11 +117,7 @@ export default function ChecklistDetails({ route, navigation }) {
                     equipements?.find((ve) => ve.id === item.entete.vehicule_id)
                       ?.matricule
                   }{" "}
-                  de type{" "}
-                  {
-                    equipements.find((ve) => ve.id === item.entete.vehicule_id)
-                      ?.lib
-                  }
+                  
                 </Text>
               </View>
             </View>
@@ -279,6 +275,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     flexDirection: "column",
     justifyContent: "space-between",
+    
    
   },
 
@@ -298,6 +295,7 @@ const styles = StyleSheet.create({
     color: "gray",
     fontSize: 13,
     marginLeft: 7,
+    
   },
 
   imageContainer: {
