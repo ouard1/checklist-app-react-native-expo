@@ -82,7 +82,7 @@ export default function ChecklistDetails({ route, navigation }) {
                 style={{
                   flexDirection: "row",
                   marginTop: 30,
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
               >
                 <Text style={styles.label}>Date: </Text>
@@ -94,10 +94,10 @@ export default function ChecklistDetails({ route, navigation }) {
                 <Text style={styles.label}>Type: </Text>
                 <Text style={styles.info}>{item.entete.type}</Text>
               </View>
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexWrap:"wrap" ,flexDirection:"row"}}>
                 <Text style={styles.label}>Chauffeur:</Text>
                 <Text style={styles.info}>
-                  {" "}
+                 
                   {
                     chauffeurs.find(
                       (chauf) => chauf.id === item.entete.chauffeur_id
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
    marginTop: 5 ,
     width: "85%",
-    height: 150,
+    height: 160,
     alignSelf: "center",
     flexDirection: "column",
     justifyContent: "space-between",
